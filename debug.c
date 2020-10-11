@@ -3,6 +3,36 @@
 #include "debug.h"
 #include "value.h"
 
+static int simple_instruction(const char *name, int offset)
+{
+  printf("%s\n", name);
+  return offset + 1;
+}
+
+static int constant_instruction(const char *name, Chunk *chunk, int offset)
+{
+  uint8_t constant = chunk->code[offset + 1];
+  printf("%-16s %4d '", name, constant);
+  print_value(chunk->constants.values[constant]);
+  printf("'\n");
+  return offset + 2;
+}
+
+static int constant_long_instruction(const char *name, Chunk *chunk, int offset)
+{
+  uint8_t hb = chunk->code[offset + 1];
+  uint8_t mb = chunk->code[offset + 2];
+  uint8_t lb = chunk->code[offset + 3];
+
+  int constant = (hb << 8) | mb;
+  constant = (constant << 8) | lb;
+
+  printf("%-16s %4d '", name, constant);
+  print_value(chunk->constants.values[constant]);
+  printf("'\n");
+  return offset + 4;
+}
+
 int disassemble_instruction(Chunk *chunk, int offset)
 {
   printf("%04d ", offset);
@@ -49,34 +79,4 @@ void disassemble_chunk(Chunk *chunk, const char *name)
   {
     offset = disassemble_instruction(chunk, offset);
   }
-}
-
-static int simple_instruction(const char *name, int offset)
-{
-  printf("%s\n", name);
-  return offset + 1;
-}
-
-static int constant_instruction(const char *name, Chunk *chunk, int offset)
-{
-  uint8_t constant = chunk->code[offset + 1];
-  printf("%-16s %4d '", name, constant);
-  print_value(chunk->constants.values[constant]);
-  printf("'\n");
-  return offset + 2;
-}
-
-static int constant_long_instruction(const char *name, Chunk *chunk, int offset)
-{
-  uint8_t hb = chunk->code[offset + 1];
-  uint8_t mb = chunk->code[offset + 2];
-  uint8_t lb = chunk->code[offset + 3];
-
-  int constant = (hb << 8) | mb;
-  constant = (constant << 8) | lb;
-
-  printf("%-16s %4d '", name, constant);
-  print_value(chunk->constants.values[constant]);
-  printf("'\n");
-  return offset + 4;
 }
