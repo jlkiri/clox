@@ -231,6 +231,7 @@ static Token string()
 
 Token scan_token()
 {
+  skip_whitespace();
   scanner.start = scanner.current;
 
   if (is_at_end())
