@@ -158,9 +158,9 @@ static TokenType identifier_type()
       switch (scanner.start[1])
       {
       case 'h':
-        return checkKeyword(2, 2, "is", TOKEN_THIS);
+        return check_keyword(2, 2, "is", TOKEN_THIS);
       case 'r':
-        return checkKeyword(2, 2, "ue", TOKEN_TRUE);
+        return check_keyword(2, 2, "ue", TOKEN_TRUE);
       }
     }
     break;
@@ -178,7 +178,7 @@ static TokenType identifier_type()
       case 'o':
         return check_keyword(2, 1, "r", TOKEN_OR);
       case 'u':
-        return checkKeyword(2, 1, "n", TOKEN_FUN);
+        return check_keyword(2, 1, "n", TOKEN_FUN);
       }
     }
     break;
@@ -237,6 +237,8 @@ Token scan_token()
     return make_token(TOKEN_EOF);
 
   char c = advance();
+
+  printf("Current char %c", c);
 
   if (is_alpha(c))
     return identifier();

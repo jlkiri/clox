@@ -16,7 +16,7 @@ static void repl()
 
     if (!fgets(line, sizeof(line), stdin))
     {
-      prinf("\n");
+      printf("\n");
       break;
     }
 
@@ -79,7 +79,7 @@ int main(int argc, const char *argv[])
   }
   else if (argc == 2)
   {
-    runFile(argv[1]);
+    run_file(argv[1]);
   }
   else
   {
