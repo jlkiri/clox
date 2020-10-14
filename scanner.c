@@ -239,8 +239,6 @@ Token scan_token()
 
   char c = advance();
 
-  printf("Current char %c", c);
-
   if (is_alpha(c))
     return identifier();
   if (is_digit(c))

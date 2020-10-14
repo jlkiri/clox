@@ -71,7 +71,7 @@ static void run_file(const char *path)
 
 int main(int argc, const char *argv[])
 {
-  initVm();
+  init_vm();
 
   if (argc == 1)
   {
@@ -87,6 +87,6 @@ int main(int argc, const char *argv[])
     exit(64);
   }
 
-  freeVm();
+  free_vm();
   return 0;
 }
