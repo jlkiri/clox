@@ -91,21 +91,26 @@ static InterpretResult run()
     uint8_t instruction;
     switch (instruction = READ_BYTE())
     {
+
     case OP_CONSTANT:
     {
       Value constant = READ_CONSTANT();
       push(constant);
       break;
     }
+
     case OP_NIL:
       push(NIL_VAL);
       break;
+
     case OP_TRUE:
       push(BOOL_VAL(true));
       break;
+
     case OP_FALSE:
       push(BOOL_VAL(false));
       break;
+
     case OP_EQUAL:
     {
       Value b = pop();
@@ -113,27 +118,51 @@ static InterpretResult run()
       push(BOOL_VAL(values_equal(a, b)));
       break;
     }
+
     case OP_GREATER:
       BINARY_OP(BOOL_VAL, >);
       break;
+
     case OP_LESS:
       BINARY_OP(BOOL_VAL, <);
       break;
+
     case OP_ADD:
-      BINARY_OP(NUMBER_VAL, +);
+    {
+      if (IS_STRING(peek(0)) && IS_STRING(peek(1)))
+      {
+        concatenate();
+      }
+      else if (IS_NUMBER(peek(0)) && IS_NUMBER(peek(1)))
+      {
+        double b = AS_NUMBER(pop());
+        double a = AS_NUMBER(pop());
+        push(NUMBER_VAL(a + b));
+      }
+      else
+      {
+        runtime_error("Operands must be two numbers or two strings.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
       break;
+    }
+
     case OP_SUBTRACT:
       BINARY_OP(NUMBER_VAL, -);
       break;
+
     case OP_MULTIPLY:
       BINARY_OP(NUMBER_VAL, *);
       break;
+
     case OP_DIVIDE:
       BINARY_OP(NUMBER_VAL, /);
       break;
+
     case OP_NOT:
       push(BOOL_VAL(is_falsey(pop())));
       break;
+
     case OP_NEGATE:
       if (!IS_NUMBER(peek(0)))
       {
@@ -142,6 +171,7 @@ static InterpretResult run()
       }
       push(NUMBER_VAL(-AS_NUMBER(pop())));
       break;
+
     case OP_RETURN:
     {
       print_value(pop());
