@@ -119,7 +119,7 @@ bool table_delete(Table *table, ObjString *key)
     return false;
 
   // Find the entry.
-  Entry *entry = find_entry(table->capacity, table->capacity, key);
+  Entry *entry = find_entry(table->entries, table->capacity, key);
   if (entry->key == NULL)
     return false;
 
