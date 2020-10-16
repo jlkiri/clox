@@ -21,16 +21,17 @@ static Obj *allocate_object(size_t size, ObjType type)
   return object;
 }
 
-static ObjString *allocate_string(const char *chars, int length, uint32_t hash)
+static ObjString *allocate_string(char *chars, int length, uint32_t hash)
 {
   ObjString *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
   string->length = length;
   string->hash = hash;
+  string->chars = chars;
+
+  /*  strcpy(string->chars, chars);
+  string->chars[length] = '\0'; */
 
   table_set(&vm.strings, string, NIL_VAL);
-  strcpy(string->chars, chars);
-
-  string->chars[length] = '\0';
 
   return string;
 }
@@ -68,7 +69,12 @@ ObjString *copy_string(const char *chars, int length)
   ObjString *interned = table_find_string(&vm.strings, chars, length, hash);
   if (interned != NULL)
     return interned;
-  return allocate_string(chars, length, hash);
+
+  char *heapChars = ALLOCATE(char, length + 1);
+  memcpy(heapChars, chars, length);
+  heapChars[length] = '\0';
+
+  return allocate_string(heapChars, length, hash);
 }
 
 void print_object(Value value)
