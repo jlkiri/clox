@@ -10,6 +10,9 @@
 #define ALLOCATE_OBJ(type, objectType) \
   (type *)allocate_object(sizeof(type), objectType)
 
+#define ALLOCATE_OBJ_FLEX(type, flexibleType, length, objectType) \
+  (type *)allocate_object(sizeof(type) + sizeof(flexibleType) * length, objectType)
+
 static Obj *allocate_object(size_t size, ObjType type)
 {
   Obj *object = (Obj *)reallocate(NULL, 0, size);
@@ -21,15 +24,14 @@ static Obj *allocate_object(size_t size, ObjType type)
   return object;
 }
 
-static ObjString *allocate_string(char *chars, int length, uint32_t hash)
+static ObjString *allocate_string(const char *chars, int length, uint32_t hash)
 {
-  ObjString *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
+  ObjString *string = ALLOCATE_OBJ_FLEX(ObjString, char, length + 1, OBJ_STRING);
   string->length = length;
   string->hash = hash;
-  string->chars = chars;
 
-  /*  strcpy(string->chars, chars);
-  string->chars[length] = '\0'; */
+  strcpy(string->chars, chars);
+  string->chars[length] = '\0';
 
   table_set(&vm.strings, string, NIL_VAL);
 
@@ -70,11 +72,7 @@ ObjString *copy_string(const char *chars, int length)
   if (interned != NULL)
     return interned;
 
-  char *heapChars = ALLOCATE(char, length + 1);
-  memcpy(heapChars, chars, length);
-  heapChars[length] = '\0';
-
-  return allocate_string(heapChars, length, hash);
+  return allocate_string(chars, length, hash);
 }
 
 void print_object(Value value)
