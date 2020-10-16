@@ -20,6 +20,7 @@
     "type_traits": "cpp",
     "vector": "cpp",
     "string": "c",
-    "iosfwd": "c"
+    "iosfwd": "c",
+    "cstring": "cpp"
   }
 }

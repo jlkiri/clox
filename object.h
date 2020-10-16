@@ -26,7 +26,7 @@ struct sObjString
 {
   Obj obj;
   int length;
-  char *chars;
+  char chars[];
 };
 
 ObjString *take_string(char *chars, int length);
