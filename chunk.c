@@ -30,7 +30,7 @@ void write_chunk(Chunk *chunk, uint8_t byte, int line)
 void write_constant(Chunk *chunk, Value value, int line)
 {
   int constant = add_constant(chunk, value);
-  if (constant >= 255)
+  if (constant > UINT8_MAX)
   {
     uint8_t hb = (constant >> 16) & 0xFF;
     uint8_t mb = (constant >> 8) & 0xFF;
