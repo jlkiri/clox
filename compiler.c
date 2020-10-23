@@ -174,7 +174,7 @@ static int emit_jump(uint8_t instruction)
 {
   emit_byte(instruction);
   emit_byte(0xff);
-  emit_bute(0xff);
+  emit_byte(0xff);
   return current_chunk()->count - 2;
 }
 
@@ -477,8 +477,6 @@ static void named_variable(Token name, bool can_assign)
     set_op = OP_SET_GLOBAL;
   }
 
-  uint8_t arg = identifier_constant(&name);
-
   if (can_assign && match(TOKEN_EQUAL))
   {
     expression();
@@ -720,7 +718,7 @@ static void while_statement()
 
   consume(TOKEN_LEFT_PAREN, "Expect '(' after 'while'.");
   expression();
-  consumne(TOKEN_RIGHT_PAREN, "Expect ')' after condition.");
+  consume(TOKEN_RIGHT_PAREN, "Expect ')' after condition.");
 
   int exit_jump = emit_jump(OP_JUMP_IF_FALSE);
 
