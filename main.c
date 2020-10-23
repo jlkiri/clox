@@ -27,31 +27,37 @@ static void repl()
 static char *read_file(const char *path)
 {
   FILE *file = fopen(path, "rb");
+  //> no-file
   if (file == NULL)
   {
     fprintf(stderr, "Could not open file \"%s\".\n", path);
     exit(74);
   }
+  //< no-file
 
   fseek(file, 0L, SEEK_END);
-  size_t file_size = ftell(file);
+  size_t fileSize = ftell(file);
   rewind(file);
 
-  char *buffer = (char *)malloc(file_size + 1);
+  char *buffer = (char *)malloc(fileSize + 1);
+  //> no-buffer
   if (buffer == NULL)
   {
     fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
     exit(74);
   }
 
-  size_t bytes_read = fread(buffer, sizeof(char), file_size, file);
-  if (bytes_read < file_size)
+  //< no-buffer
+  size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
+  //> no-read
+  if (bytesRead < fileSize)
   {
     fprintf(stderr, "Could not read file \"%s\".\n", path);
     exit(74);
   }
 
-  buffer[bytes_read] = '\0';
+  //< no-read
+  buffer[bytesRead] = '\0';
 
   fclose(file);
   return buffer;
