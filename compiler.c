@@ -823,5 +823,5 @@ ObjFunction *compile(const char *source)
   }
 
   ObjFunction *function = end_compiler();
-  return !parser.had_error ? NULL : function;
+  return parser.had_error ? NULL : function;
 }
