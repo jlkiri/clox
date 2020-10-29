@@ -43,12 +43,10 @@ ObjNative *new_native(NativeFn function)
 
 static ObjString *allocate_string(const char *chars, int length, uint32_t hash)
 {
-  ObjString *string = ALLOCATE_OBJ_FLEX(ObjString, char, length + 1, OBJ_STRING);
+  ObjString *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
   string->length = length;
   string->hash = hash;
-
-  strcpy(string->chars, chars);
-  string->chars[length] = '\0';
+  string->chars = chars;
 
   table_set(&vm.strings, string, NIL_VAL);
 

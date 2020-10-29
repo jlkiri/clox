@@ -51,7 +51,7 @@ struct sObjString
   Obj obj;
   int length;
   uint32_t hash;
-  char chars[];
+  char *chars;
 };
 
 ObjFunction *new_function();
