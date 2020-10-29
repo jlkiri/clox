@@ -8,8 +8,14 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 VM vm;
+
+static Value clock_native(int arg_count, Value *args)
+{
+  return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
+}
 
 static void reset_stack()
 {
@@ -25,12 +31,32 @@ static void runtime_error(const char *format, ...)
   va_end(args);
   fputs("\n", stderr);
 
-  CallFrame *frame = &vm.frames[vm.frame_count - 1];
-  size_t instruction = frame->ip - frame->function->chunk.code - 1;
-  int line = frame->function->chunk.lines[instruction];
-  fprintf(stderr, "[line %d] in script\n", line);
+  for (int i = vm.frame_count - 1; i >= 0; i--)
+  {
+    CallFrame *frame = &vm.frames[i];
+    ObjFunction *function = frame->function;
+    size_t instruction = frame->ip - function->chunk.code - 1;
+    fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
+    if (function->name == NULL)
+    {
+      fprintf(stderr, "script\n");
+    }
+    else
+    {
+      fprintf(stderr, "%s()\n", function->name->chars);
+    }
+  }
 
   reset_stack();
+}
+
+static void define_native(const char *name, NativeFn function)
+{
+  push(OBJ_VAL(copy_string(name, (int)strlen(name))));
+  push(OBJ_VAL(new_native(function)));
+  table_set(&vm.globals, AS_STRING(vm.stack[0]), vm.stack[1]);
+  pop();
+  pop();
 }
 
 void init_vm()
@@ -40,6 +66,8 @@ void init_vm()
 
   init_table(&vm.globals);
   init_table(&vm.strings);
+
+  define_native("clock", clock_native);
 }
 
 void free_vm()
@@ -68,6 +96,18 @@ static Value peek(int distance)
 
 static bool call(ObjFunction *function, int arg_count)
 {
+  if (arg_count != function->arity)
+  {
+    runtime_error("Expected %d arguments but got %d.", function->arity, arg_count);
+    return false;
+  }
+
+  if (vm.frame_count == FRAMES_MAX)
+  {
+    runtime_error("Stack overflow.");
+    return false;
+  }
+
   CallFrame *frame = &vm.frames[vm.frame_count++];
   frame->function = function;
   frame->ip = function->chunk.code;
@@ -84,6 +124,15 @@ static bool call_value(Value callee, int arg_count)
     {
     case OBJ_FUNCTION:
       return call(AS_FUNCTION(callee), arg_count);
+
+    case OBJ_NATIVE:
+    {
+      NativeFn native = AS_NATIVE(callee);
+      Value result = native(arg_count, vm.stack_top - arg_count);
+      vm.stack_top -= arg_count + 1;
+      push(result);
+      return true;
+    }
 
     default:
       // Non-callable object type.
@@ -327,7 +376,19 @@ static InterpretResult run()
 
     case OP_RETURN:
     {
-      return INTERPRET_OK;
+      Value result = pop();
+
+      vm.frame_count--;
+      if (vm.frame_count == 0)
+      {
+        pop();
+        return INTERPRET_OK;
+      }
+
+      vm.stack_top = frame->slots;
+      push(result);
+      frame = &vm.frames[vm.frame_count - 1];
+      break;
     }
     }
   }
