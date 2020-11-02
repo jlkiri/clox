@@ -17,9 +17,14 @@ static Obj *allocate_object(size_t size, ObjType type)
 {
   Obj *object = (Obj *)reallocate(NULL, 0, size);
   object->type = type;
+  object->is_marked = false;
 
   object->next = vm.objects;
   vm.objects = object;
+
+#ifdef DEBUG_LOG_GC
+  printf("%p allocate %ld for %d\n", (void *)object, size, type);
+#endif
 
   return object;
 }
@@ -104,7 +109,7 @@ ObjString *copy_string(const char *chars, int length)
   if (interned != NULL)
     return interned;
 
-  char* heapChars = ALLOCATE(char, length + 1);
+  char *heapChars = ALLOCATE(char, length + 1);
   memcpy(heapChars, chars, length);
   heapChars[length] = '\0';
 
