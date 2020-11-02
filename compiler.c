@@ -63,7 +63,7 @@ typedef enum
 
 typedef struct
 {
-  struct Compiler *enclosing;
+  struct Compiler* enclosing;
   ObjFunction *function;
   FunctionType type;
 
@@ -587,11 +587,11 @@ static void named_variable(Token name, bool can_assign)
   if (can_assign && match(TOKEN_EQUAL))
   {
     expression();
-    emit_bytes(set_op, arg);
+    emit_bytes(set_op, (uint8_t)arg);
   }
   else
   {
-    emit_bytes(get_op, arg);
+    emit_bytes(get_op, (uint8_t)arg);
   }
 }
 
