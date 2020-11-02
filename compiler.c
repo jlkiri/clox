@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "compiler.h"
+#include "memory.h"
 #include "scanner.h"
 
 #ifdef DEBUG_PRINT_CODE
@@ -61,7 +62,7 @@ typedef enum
   TYPE_SCRIPT
 } FunctionType;
 
-typedef struct
+typedef struct Compiler
 {
   struct Compiler* enclosing;
   ObjFunction *function;
