@@ -131,8 +131,6 @@ static bool call_value(Value callee, int arg_count)
     {
     case OBJ_CLOSURE:
       return call(AS_CLOSURE(callee), arg_count);
-    case OBJ_FUNCTION:
-      return call(AS_FUNCTION(callee), arg_count);
 
     case OBJ_NATIVE:
     {
@@ -169,7 +167,9 @@ static ObjUpvalue *capture_upvalue(Value *local)
     return upvalue;
   }
 
+  printf("before create new upvalue");
   ObjUpvalue *created_upvalue = new_upvalue(local);
+  printf("created new upvalue");
   created_upvalue->next = upvalue;
 
   if (prev_upvalue == NULL)
@@ -449,6 +449,7 @@ static InterpretResult run()
       {
         uint8_t is_local = READ_BYTE();
         uint8_t index = READ_BYTE();
+
         if (is_local)
         {
           closure->upvalues[i] = capture_upvalue(frame->slots + index);
@@ -458,6 +459,7 @@ static InterpretResult run()
           closure->upvalues[i] = frame->closure->upvalues[index];
         }
       }
+
       break;
     }
 

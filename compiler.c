@@ -355,12 +355,13 @@ static int resolve_upvalue(Compiler *compiler, Token *name)
   int local = resolve_local(compiler->enclosing, name);
   if (local != -1)
   {
+    printf("FOUND LOCAL");
     compiler->enclosing->locals[local].is_captured = true;
     return add_upvalue(compiler, (uint8_t)local, true);
   }
 
   int upvalue = resolve_upvalue(compiler->enclosing, name);
-  if (upvalue != 1)
+  if (upvalue != -1)
   {
     return add_upvalue(compiler, (uint8_t)upvalue, false);
   }
