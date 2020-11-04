@@ -6,6 +6,7 @@
 #include "compiler.h"
 #include "memory.h"
 #include "scanner.h"
+#include "memory.h"
 
 #ifdef DEBUG_PRINT_CODE
 #include "debug.h"
@@ -64,7 +65,7 @@ typedef enum
 
 typedef struct Compiler
 {
-  struct Compiler* enclosing;
+  struct Compiler *enclosing;
   ObjFunction *function;
   FunctionType type;
 
@@ -1006,4 +1007,14 @@ ObjFunction *compile(const char *source)
 
   ObjFunction *function = end_compiler();
   return parser.had_error ? NULL : function;
+}
+
+void mark_compiler_roots()
+{
+  Compiler *compiler = current;
+  while (compiler != NULL)
+  {
+    mark_object((Obj *)compiler->function);
+    compiler = compiler->enclosing;
+  }
 }

@@ -70,7 +70,9 @@ static ObjString *allocate_string(char *chars, int length, uint32_t hash)
   string->hash = hash;
   string->chars = chars;
 
+  push(OBJ_VAL(string));
   table_set(&vm.strings, string, NIL_VAL);
+  pop();
 
   return string;
 }
