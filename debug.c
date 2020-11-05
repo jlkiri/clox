@@ -114,6 +114,8 @@ int disassemble_instruction(Chunk *chunk, int offset)
   }
   case OP_RETURN:
     return simple_instruction("OP_RETURN", offset);
+  case OP_CLASS:
+    return constant_instruction("OP_CLASS", chunk, offset);
   case OP_CLOSE_UPVALUE:
     return simple_instruction("OP_CLOSE_UPVALUE", offset);
   case OP_NIL:
@@ -132,6 +134,10 @@ int disassemble_instruction(Chunk *chunk, int offset)
     return byte_instruction("OP_GET_UPVALUE", chunk, offset);
   case OP_SET_UPVALUE:
     return byte_instruction("OP_SET_UPVALUE", chunk, offset);
+  case OP_GET_PROPERTY:
+    return constant_instruction("OP_GET_PROPERTY", chunk, offset);
+  case OP_SET_PROPERTY:
+    return constant_instruction("OP_SET_PROPERTY", chunk, offset);
   case OP_DEFINE_GLOBAL:
     return constant_instruction("OP_DEFINE_GLOBAL", chunk, offset);
   case OP_SET_GLOBAL:
